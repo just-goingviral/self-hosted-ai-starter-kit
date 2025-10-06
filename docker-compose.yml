@@ -148,3 +148,27 @@ services:
     image: ollama/ollama:rocm
     depends_on:
      - ollama-gpu-amd
+  rifton-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: rifton-webui
+    restart: unless-stopped
+    networks: ['demo']
+    ports:
+      - "3000:8080"       # Browser UI → http://localhost:3000
+    environment:
+      # Connect WebUI to your Ollama API (for chat + embeddings)
+      OLLAMA_BASE_URL: "http://ollama:11434"
+      OPENAI_API_BASE_URL: "http://ollama:11434/v1"
+      # Enable file/image uploads for multimodal chat
+      ENABLE_IMAGE_UPLOADS: "true"
+      ENABLE_FILE_UPLOADS: "true"
+      ENABLE_MULTIMODAL: "true"
+      # Optional: name + personality
+      WEBUI_NAME: "Rifton"
+      SYSTEM_PROMPT: |
+        You are **Rifton**, a pragmatic and accurate AI collaborator built by Dustin B. Salinas.
+        - Be concise by default; use bullet points when helpful.
+        - Favor reproducible code and concrete reasoning.
+        - Support image and document reasoning seamlessly.
+    depends_on:
+      - ollama-cpu
